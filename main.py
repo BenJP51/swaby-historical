@@ -1,5 +1,5 @@
 from yahoo_finance import Share
-import time, json, sys
+import time, json, sys, ssl
 
 class Wallet():
 
@@ -185,7 +185,9 @@ w = Wallet()
 
 stocksToWatch = "TMUS"
 
-percentChange = 0.5
+percentChange = 0.05
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 shre = ShareObj(stocksToWatch)
 print(shre.getHistorical("2016-12-01", "2017-02-17"))
