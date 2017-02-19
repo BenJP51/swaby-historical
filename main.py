@@ -16,7 +16,6 @@ class Wallet():
         obj.refresh()
 
         if(self.cash > float(obj.getPrice())): #if you have sufficient funds
-
             with open('data.json', 'r+') as file:
                 try:
                     data = json.load(file) # read file
@@ -30,26 +29,12 @@ class Wallet():
 
 
                 try: #to allow for multiple shares to be done you could like set a variable of percent change in the json, read that. if that *= 0.05 isn't less that the current percent change, don't buy again
-                    highestIDIndex = -1
-
-                    for i in range(0,len(data["shares"])): #iterate through all shares
-                        if(data["shares"][i]["id"] == obj.getID()): #get the most recently added share
-                            highestIDIndex = i
-                    error = False
-                    if(highestIDIndex != -1): # if highestIDIndex is -1, it means that the share is not yet owned, so add it w/o comparing change
-                        data["shares"].append({ # add new price to appropriate id
-                            "id": obj.getID(),
-                            "price": obj.getPrice(),
-                            "time": time.strftime("%H:%M:%S"),
-                            "change": obj.getChange()
-                        })
-                    else:
-                        data["shares"].append({ # add new price to appropriate id
-                            "id": obj.getID(),
-                            "price": obj.getPrice(),
-                            "time": time.strftime("%H:%M:%S"),
-                            "change": obj.getChange()
-                        })
+                    data["shares"].append({ # add new price to appropriate id
+                        "id": obj.getID(),
+                        "price": obj.getPrice(),
+                        "time": time.strftime("%H:%M:%S"),
+                        "change": obj.getChange()
+                    })
 
                 except AttributeError:
                     # uh oh!!! that ID doesnt exist yet!! just create it :)
@@ -65,8 +50,7 @@ class Wallet():
                 file.write(data)
                 file.close()
 
-                if not (error):
-                    self.setCash(self.cash - float(obj.getPrice())) #buy that shit
+                self.setCash(self.cash - float(obj.getPrice())) #buy that shit
 
                 self.writeCash()
 
@@ -184,7 +168,7 @@ w = Wallet()
 
 stocksToWatch = "TMUS"
 
-percentChange = 0.05
+percentChange = 0.1
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -201,5 +185,3 @@ for i in range(len(historicalData)):
         w.buy(shre.getID())
     else:
         print("not enough change")
-
-    
