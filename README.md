@@ -13,6 +13,6 @@ python3 main.py
 ## ToDo
  - Logging in External Files
  - Config file
- - Optimize
+ - Optimize :check:
  - Write GUI
- - Output to XSLX
+ - Output to XSLX :check:
