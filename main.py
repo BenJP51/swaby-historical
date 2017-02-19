@@ -158,7 +158,7 @@ stocksToWatch = "TMUS"
 ssl._create_default_https_context = ssl._create_unverified_context
 
 shre = ShareObj(stocksToWatch)
-historicalData = shre.getHistorical("2016-11-21", "2017-02-17")
+historicalData = shre.getHistorical("2016-09-21", "2017-02-17")
 
 total = 0
 for l in range(len(historicalData)):
