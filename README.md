@@ -5,9 +5,9 @@ With luck, this will automatically buy and sell shares in a company.
 
 ```
 git clone https://github.com/benjp51/swaby-historical.git
-cd swaby-historical && pip install -r requirements.txt
+cd swaby-historical && pip3 install -r requirements.txt
 
-python main.py
+python3 main.py
 ```
 
 ## ToDo

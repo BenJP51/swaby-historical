@@ -4,12 +4,7 @@ import time, json, sys, ssl, math
 class Wallet():
 
     def __init__(self):
-        with open('data.json', 'r+') as file: #open file
-            try:
-                data = json.load(file) # read file
-                self.cash = data["userdata"]["wallet"]
-            except ValueError:
-                raise ValueError('Cannot read JSON file')
+        a = 1
 
     def buy(self, ID, price):
         obj = ShareObj(ID)
@@ -31,18 +26,14 @@ class Wallet():
                 try: #to allow for multiple shares to be done you could like set a variable of percent change in the json, read that. if that *= 0.05 isn't less that the current percent change, don't buy again
                     data["shares"].append({ # add new price to appropriate id
                         "id": obj.getID(),
-                        "price": price,
-                        "time": time.strftime("%H:%M:%S"),
-                        "change": obj.getChange()
+                        "price": price
                     })
 
                 except AttributeError:
                     # uh oh!!! that ID doesnt exist yet!! just create it :)
                     data['shares'].append({
                         "id": obj.getID(),
-                        "price": price,
-                        "time": time.strftime("%H:%M:%S"),
-                        "change": obj.getChange()
+                        "price": price
                     })
 
                 data = str(data).replace("'", '"')
@@ -179,7 +170,7 @@ for l in range(len(historicalData)):
 percentChange = (total/len(historicalData))+1
 
 w.setCash(10000)
-
+total = 1
 for i in range(len(historicalData)):
     closeVar = float(historicalData[i]["Close"]) #is this optimization??? the world may never know
     openVar = float(historicalData[i]["Open"])
@@ -190,9 +181,10 @@ for i in range(len(historicalData)):
         w.sell(shre.getID(), closeVar)
     elif(iterationsPercentChange > percentChange):
         sharesBought = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + closeVar)/3)*2)-closeVar)
-        print("["+time.strftime("%H:%M:%S")+"] [CASH]\t"+str(w.getCash()))
-        print("["+time.strftime("%H:%M:%S")+"] [SHARES]\t"+str(sharesBought))
+        print("["+time.strftime("%H:%M:%S")+"] [CASH]\t\t"+str(w.getCash()))
+        print("["+time.strftime("%H:%M:%S")+"] [SHARES]\t ["+str(total)+"]\t"+str(sharesBought))
         for k in range(sharesBought):
             w.buy(shre.getID(), openVar)
+        total += 1
     else:
         print("Not enough change in share interval.")
