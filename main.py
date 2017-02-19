@@ -69,7 +69,7 @@ class Wallet():
             file.truncate()
 
             if not (self.isOwned(obj.getID(), data)):
-                print("["+time.strftime("%H:%M:%S")+"] [SHARE] ["+ shre.getID() +"] [SELL] Share Not Owned")
+                # print("["+time.strftime("%H:%M:%S")+"] [SHARE] ["+ shre.getID() +"] [SELL] Share Not Owned")
 
                 data = str(data).replace("'", '"') #clean up json
 
@@ -123,7 +123,6 @@ class Wallet():
             for i in range(0,len(data["shares"])): #for the amount of shares recorded in json file
                 try:
                     if(data["shares"][i]["id"] == ID): #checks if valid id, as in, does this share exist in the JSON?
-                        print(ID + " OWNED")
                         return True
                 except AttributeError: #if error, report it
                     print("ERROR - SELLING - share ID doesn't exist.")
@@ -168,20 +167,23 @@ w = Wallet()
 
 stocksToWatch = "TMUS"
 
-percentChange = 0.1
+percentChange = [0.01, 0.05, 0.1,0.5,1,1.5,2, 2.5, 3]
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 shre = ShareObj(stocksToWatch)
-historicalData = shre.getHistorical("2016-12-01", "2017-02-17")
+historicalData = shre.getHistorical("2016-02-17", "2017-02-17")
 
-for i in range(len(historicalData)):
-    iterationsPercentChange = shre.getCalculatedChange(float(historicalData[i]["Open"]), float(historicalData[i]["Close"]))
-    if(iterationsPercentChange < percentChange): # if it is less than the percent change we're looking for, do this
-        print("less")
-        w.sell(shre.getID(), float(historicalData[i]["Close"]))
-    elif(iterationsPercentChange > percentChange):
-        print("more")
-        w.buy(shre.getID(), float(historicalData[i]["Close"]))
-    else:
-        print("not enough change")
+for j in range(len(percentChange)):
+    for i in range(len(historicalData)):
+        iterationsPercentChange = shre.getCalculatedChange(float(historicalData[i]["Open"]), float(historicalData[i]["Close"]))
+        if(iterationsPercentChange < percentChange[j]): # if it is less than the percent change we're looking for, do this
+            w.sell(shre.getID(), float(historicalData[i]["Open"]))
+        elif(iterationsPercentChange > percentChange[j]):
+            w.buy(shre.getID(), float(historicalData[i]["Open"]))
+        else:
+            print("not enough change")
+    print(str(percentChange[j])+" | "+str(w.getCash()-10000)
+
+#10000 -> 9978.820002999999
+#10000 -> 9996.929997
