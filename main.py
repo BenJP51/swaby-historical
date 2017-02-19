@@ -165,14 +165,20 @@ class ShareObj(object):
 
 w = Wallet()
 
-stocksToWatch = "AMZN"
-
-percentChange = [5]#0.01, 0.05, 0.1]#, 0.5,1,1.5,2, 2.5, 3]
+stocksToWatch = "TMUS"
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 shre = ShareObj(stocksToWatch)
 historicalData = shre.getHistorical("2016-02-17", "2017-02-17")
+
+total = 0
+index = 0
+for l in range(len(historicalData)):
+        total += shre.getCalculatedChange(float(historicalData[l]["Open"]), float(historicalData[l]["Close"]))
+        index +=1
+
+percentChange = [(total/index)+1]
 
 for j in range(len(percentChange)):
     w.setCash(10000)
@@ -182,6 +188,7 @@ for j in range(len(percentChange)):
             w.sell(shre.getID(), float(historicalData[i]["Close"]))
         elif(iterationsPercentChange > percentChange[j]):
             pivotPoint = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + float(historicalData[i]["Close"]))/3)*2)-float(historicalData[i]["Close"]))
+            print(time.strftime("%H:%M:%S"))
             print(w.getCash())
             print(pivotPoint)
             for k in range(pivotPoint):
