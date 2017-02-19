@@ -1,5 +1,5 @@
 from yahoo_finance import Share
-import time, json, sys, ssl
+import time, json, sys, ssl, math
 
 class Wallet():
 
@@ -165,9 +165,9 @@ class ShareObj(object):
 
 w = Wallet()
 
-stocksToWatch = "TMUS"
+stocksToWatch = "AMZN"
 
-percentChange = [0.01, 0.05, 0.1,0.5,1,1.5,2, 2.5, 3]
+percentChange = [5]#0.01, 0.05, 0.1]#, 0.5,1,1.5,2, 2.5, 3]
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -175,15 +175,20 @@ shre = ShareObj(stocksToWatch)
 historicalData = shre.getHistorical("2016-02-17", "2017-02-17")
 
 for j in range(len(percentChange)):
+    w.setCash(10000)
     for i in range(len(historicalData)):
         iterationsPercentChange = shre.getCalculatedChange(float(historicalData[i]["Open"]), float(historicalData[i]["Close"]))
         if(iterationsPercentChange < percentChange[j]): # if it is less than the percent change we're looking for, do this
-            w.sell(shre.getID(), float(historicalData[i]["Open"]))
+            w.sell(shre.getID(), float(historicalData[i]["Close"]))
         elif(iterationsPercentChange > percentChange[j]):
-            w.buy(shre.getID(), float(historicalData[i]["Open"]))
+            pivotPoint = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + float(historicalData[i]["Close"]))/3)*2)-float(historicalData[i]["Close"]))
+            print(w.getCash())
+            print(pivotPoint)
+            for k in range(pivotPoint):
+                w.buy(shre.getID(), float(historicalData[i]["Open"]))
         else:
             print("not enough change")
-    print(str(percentChange[j])+" | "+str(w.getCash()-10000)
+    print(str(percentChange[j])+" | "+str(w.getCash()-10000))
 
 #10000 -> 9978.820002999999
 #10000 -> 9996.929997
