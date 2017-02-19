@@ -181,7 +181,7 @@ class ShareObj(object):
     def getHistorical(self,date1, date2):
         return self.share.get_historical(date1,date2)
 
-    def getCalculatedChange(open, close):
+    def getCalculatedChange(self, open, close):
         return ((close - open)/open)*100
 
 w = Wallet()
@@ -193,4 +193,16 @@ percentChange = 0.05
 ssl._create_default_https_context = ssl._create_unverified_context
 
 shre = ShareObj(stocksToWatch)
-print(shre.getHistorical("2016-12-01", "2017-02-17"))
+historicalData = shre.getHistorical("2016-12-01", "2017-02-17")
+
+for i in range(len(historicalData)):
+    iterationsPercentChange = shre.getCalculatedChange(float(historicalData[i]["Open"]), float(historicalData[i]["Close"]))
+    if(iterationsPercentChange < percentChange): # if it is less than the percent change we're looking for, do this
+        print("less")
+    elif(iterationsPercentChange > percentChange): 
+        print("more")
+    else:
+        print("not enough change")
+
+
+    
