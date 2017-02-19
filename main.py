@@ -173,29 +173,26 @@ shre = ShareObj(stocksToWatch)
 historicalData = shre.getHistorical("2016-02-17", "2017-02-17")
 
 total = 0
-index = 0
 for l in range(len(historicalData)):
         total += shre.getCalculatedChange(float(historicalData[l]["Open"]), float(historicalData[l]["Close"]))
-        index +=1
 
-percentChange = [(total/index)+1]
+percentChange = (total/len(historicalData))+1
 
-for j in range(len(percentChange)):
-    w.setCash(10000)
-    for i in range(len(historicalData)):
-        iterationsPercentChange = shre.getCalculatedChange(float(historicalData[i]["Open"]), float(historicalData[i]["Close"]))
-        if(iterationsPercentChange < percentChange[j]): # if it is less than the percent change we're looking for, do this
-            w.sell(shre.getID(), float(historicalData[i]["Close"]))
-        elif(iterationsPercentChange > percentChange[j]):
-            pivotPoint = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + float(historicalData[i]["Close"]))/3)*2)-float(historicalData[i]["Close"]))
-            print(time.strftime("%H:%M:%S"))
-            print(w.getCash())
-            print(pivotPoint)
-            for k in range(pivotPoint):
-                w.buy(shre.getID(), float(historicalData[i]["Open"]))
-        else:
-            print("not enough change")
-    print(str(percentChange[j])+" | "+str(w.getCash()-10000))
+w.setCash(10000)
 
-#10000 -> 9978.820002999999
-#10000 -> 9996.929997
+for i in range(len(historicalData)):
+    closeVar = float(historicalData[i]["Close"]) #is this optimization??? the world may never know
+    openVar = float(historicalData[i]["Open"])
+
+    iterationsPercentChange = shre.getCalculatedChange(openVar, closeVar)
+
+    if(iterationsPercentChange < percentChange): # if it is less than the percent change we're looking for, do this
+        w.sell(shre.getID(), closeVar)
+    elif(iterationsPercentChange > percentChange):
+        sharesBought = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + closeVar)/3)*2)-closeVar)
+        print("["+time.strftime("%H:%M:%S")+"] [CASH]\t"+str(w.getCash()))
+        print("["+time.strftime("%H:%M:%S")+"] [SHARES]\t"+str(sharesBought))
+        for k in range(sharesBought):
+            w.buy(shre.getID(), openVar)
+    else:
+        print("Not enough change in share interval.")
