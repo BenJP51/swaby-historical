@@ -155,6 +155,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 w = Wallet()
 workbook = xlsxwriter.Workbook('stocks.xlsx') # create excel file
 worksheet = workbook.add_worksheet()
+file = open("out.log", "w") 
 
 stocksToWatch = "EXPE" # For example: FB, TMUS, AMD, MSFT, EXPE
 shre = ShareObj(stocksToWatch)
@@ -185,9 +186,14 @@ for i in range(len(historicalData)):
     elif(iterationsPercentChange > percentChange): # if change for current day is higher than average
         sharesBought = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + closeVar)/3)*2)-closeVar)
         print("["+time.strftime("%H:%M:%S")+"] [CASH]\t\t"+str(w.getCash()))
+        file.write(("["+time.strftime("%H:%M:%S")+"]"))
+        file.write(" Shares ID: " + str(total))
+        file.write(" Cash " + str(w.getCash()))
+        file.write(" Shares Bought " + str(sharesBought) + "\n")
+
         worksheet.write(total, 0, time.strftime("%H:%M:%S"))
         worksheet.write(total, 1, int(total))
-        worksheet.write(total, 2, w.getCash())
+        worksheet.write(total, 2, str(w.getCash()))
         worksheet.write(total, 3, sharesBought)
 
         w.buy(shre.getID(), openVar, sharesBought)
