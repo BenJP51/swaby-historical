@@ -181,6 +181,9 @@ class ShareObj(object):
     def getHistorical(self,date1, date2):
         return self.share.get_historical(date1,date2)
 
+    def getCalculatedChange(open, close):
+        return ((close - open)/open)*100
+
 w = Wallet()
 
 stocksToWatch = "TMUS"
