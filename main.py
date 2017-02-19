@@ -180,35 +180,6 @@ class ShareObj(object):
 
 w = Wallet()
 
-stocksToWatch = ["TSLA", "FB", "MSFT", "AMZN", "GOOG", "BTC"]
+stocksToWatch = "TMUS"
 
-percentChange = 0.05
-
-while(True):
-    for i in stocksToWatch:
-        shre = ShareObj(i)
-        shre.refresh()
-
-        print("["+time.strftime("%H:%M:%S")+"] [WALLET] $%.2f\t" % w.getCash())
-        print("["+time.strftime("%H:%M:%S")+"] [SHARE] ["+shre.getID()+"] [CHANGE] "+str(shre.getChange())+"%")
-
-        if(float(shre.getChange()) >= percentChange):
-            print("["+time.strftime("%H:%M:%S")+"] [BUY]")
-            print("["+time.strftime("%H:%M:%S")+"] [WALLET] %.2f\t" % w.getCash())
-            print("["+time.strftime("%H:%M:%S")+"] [SHARE] ["+ shre.getID() +"] [BUY] "+str(shre.getPrice()))
-
-            w.buy(shre.getID())
-
-            print("["+time.strftime("%H:%M:%S")+"] [WALLET] %.2f\t" % w.getCash())
-        elif(float(shre.getChange()) <= (-1*percentChange)):
-            print("["+time.strftime("%H:%M:%S")+"] [SELL]")
-            print("["+time.strftime("%H:%M:%S")+"] [WALLET] %.2f\t" % w.getCash())
-            print("["+time.strftime("%H:%M:%S")+"] [SHARE] ["+ shre.getID() +"] [SELL] "+str(shre.getPrice()))
-
-            w.sell(shre.getID())
-
-            print("["+time.strftime("%H:%M:%S")+"] [WALLET] %.2f\t" % w.getCash())
-        else:
-            print("["+time.strftime("%H:%M:%S")+"] [SHARE] ["+ shre.getID() +"] [N/A] [CHANGE] <"+str(percentChange))
-        print("\n")
-    time.sleep(15)
+percentChange = 0.5
