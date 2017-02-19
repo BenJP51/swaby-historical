@@ -181,11 +181,14 @@ class ShareObj(object):
     def getHistorical(self,date1, date2):
         return self.share.get_historical(date1,date2)
 
+    def getCalculatedChange(open, close):
+        return ((close - open)/open)*100
+
 w = Wallet()
 
 stocksToWatch = "TMUS"
 
-percentChange = 0.5
+percentChange = 0.05
 
 shre = ShareObj(stocksToWatch)
 print(shre.getHistorical("2016-12-01", "2017-02-17"))
