@@ -1,5 +1,5 @@
 from yahoo_finance import Share
-import time, json, sys, ssl, math
+import time, json, sys, ssl, math, xlsxwriter
 
 class Wallet():
 
@@ -151,6 +151,8 @@ class ShareObj(object):
     def getCalculatedChange(self, open, close):
         return ((close - open)/open)*100
 
+workbook = xlsxwriter.Workbook('stocks.xlsx') # create excel file
+worksheet = workbook.add_worksheet()
 w = Wallet()
 
 stocksToWatch = "TMUS"
@@ -159,6 +161,12 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 shre = ShareObj(stocksToWatch)
 historicalData = shre.getHistorical("2016-09-21", "2017-02-17")
+
+
+worksheet.write(0, 0, 'Time')
+worksheet.write(0, 1, 'Shares')
+worksheet.write(0, 2, 'Cash')
+worksheet.write(0, 3, 'Shares Bought')
 
 total = 0
 for l in range(len(historicalData)):
@@ -179,7 +187,11 @@ for i in range(len(historicalData)):
     elif(iterationsPercentChange > percentChange): # if change for current day is higher than average
         sharesBought = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + closeVar)/3)*2)-closeVar)
         print("["+time.strftime("%H:%M:%S")+"] [CASH]\t\t"+str(w.getCash()))
+        worksheet.write(total, 0, time.strftime("%H:%M:%S"))
+        worksheet.write(total, 1, int(total))
+        worksheet.write(total, 2, w.getCash())
         print("["+time.strftime("%H:%M:%S")+"] [SHARES]\t ["+str(total)+"]\t"+str(sharesBought))
+        worksheet.write(total, 3, sharesBought)
 
         w.buy(shre.getID(), openVar, sharesBought)
 
@@ -187,3 +199,6 @@ for i in range(len(historicalData)):
 
 w.sell(shre.getID(), closeVar)
 print("Ending total: "+str(w.getCash()))
+worksheet.write(total, 1, int(total))
+worksheet.write(total, 2, w.getCash())
+workbook.close()
