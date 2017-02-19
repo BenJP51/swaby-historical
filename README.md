@@ -11,8 +11,8 @@ python3 main.py
 ```
 
 ## ToDo
- - Logging in External Files
- - Config file
+ - Logging in External Files :check:
+ - Config file :check:
  - Optimize :check:
  - Write GUI
  - Output to XSLX :check:
