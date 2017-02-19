@@ -2,15 +2,14 @@ from yahoo_finance import Share
 import time, json, sys, ssl, math, xlsxwriter
 
 class Wallet():
-
-    def __init__(self):
-        a = 1
-
     def buy(self, ID, price, numToBuy):
         obj = ShareObj(ID)
         obj.refresh()
 
         if(self.cash > price): #if you have sufficient funds
+            if(self.cash < price*numToBuy):
+                numToBuy = int((self.cash / numToBuy)- 3)
+
             with open('data.json', 'r+') as file:
                 try:
                     data = json.load(file) # read file
@@ -151,17 +150,15 @@ class ShareObj(object):
     def getCalculatedChange(self, open, close):
         return ((close - open)/open)*100
 
-workbook = xlsxwriter.Workbook('stocks.xlsx') # create excel file
-worksheet = workbook.add_worksheet()
-w = Wallet()
-
-stocksToWatch = "TMUS"
-
 ssl._create_default_https_context = ssl._create_unverified_context
 
+w = Wallet()
+workbook = xlsxwriter.Workbook('stocks.xlsx') # create excel file
+worksheet = workbook.add_worksheet()
+
+stocksToWatch = "EXPE" # For example: FB, TMUS, AMD, MSFT, EXPE
 shre = ShareObj(stocksToWatch)
 historicalData = shre.getHistorical("2016-09-21", "2017-02-17")
-
 
 worksheet.write(0, 0, 'Time')
 worksheet.write(0, 1, 'Shares')
@@ -172,7 +169,8 @@ total = 0
 for l in range(len(historicalData)):
         total += shre.getCalculatedChange(float(historicalData[l]["Open"]), float(historicalData[l]["Close"]))
 
-percentChange = (total/len(historicalData))+1
+slope = (float(historicalData[0]["Open"]) - float(historicalData[len(historicalData)-1]["Close"]))/len(historicalData)
+percentChange = (total/len(historicalData))+slope
 
 w.setCash(10000)
 total = 1
@@ -190,7 +188,6 @@ for i in range(len(historicalData)):
         worksheet.write(total, 0, time.strftime("%H:%M:%S"))
         worksheet.write(total, 1, int(total))
         worksheet.write(total, 2, w.getCash())
-        print("["+time.strftime("%H:%M:%S")+"] [SHARES]\t ["+str(total)+"]\t"+str(sharesBought))
         worksheet.write(total, 3, sharesBought)
 
         w.buy(shre.getID(), openVar, sharesBought)
