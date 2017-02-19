@@ -198,4 +198,12 @@ w.sell(shre.getID(), closeVar)
 print("Ending total: "+str(w.getCash()))
 worksheet.write(total, 1, int(total))
 worksheet.write(total, 2, w.getCash())
+
+chart = workbook.add_chart({'type': 'line'})
+
+chart.add_series({'values':    '=Sheet1!$C$2:$C'+str(len(historicalData)+1)})
+chart.set_title ({'name': 'Revenue Chart'})
+chart.set_style(10)
+worksheet.insert_chart('F2', chart)
+
 workbook.close()
