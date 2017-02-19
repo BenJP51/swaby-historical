@@ -155,16 +155,29 @@ ssl._create_default_https_context = ssl._create_unverified_context
 w = Wallet()
 workbook = xlsxwriter.Workbook('stocks.xlsx') # create excel file
 worksheet = workbook.add_worksheet()
-file = open("out.log", "w") 
 
-stocksToWatch = "EXPE" # For example: FB, TMUS, AMD, MSFT, EXPE
+with open('config.json', 'r+') as file: # open file
+    try:
+        config = json.load(file) # read file
+    except ValueError:
+        raise ValueError('Cannot read JSON file')
+
+excel = config["excel"]
+stock = config["stock"]
+
+if(excel):
+    print("Excel mode on.")
+    workbook = xlsxwriter.Workbook('stocks.xlsx') # create excel file
+    worksheet = workbook.add_worksheet()
+
+    worksheet.write(0, 0, 'Time')
+    worksheet.write(0, 1, 'Shares')
+    worksheet.write(0, 2, 'Cash')
+    worksheet.write(0, 3, 'Shares Bought')
+
+stocksToWatch = stock # For example: FB, TMUS, AMD, MSFT, EXPE
 shre = ShareObj(stocksToWatch)
 historicalData = shre.getHistorical("2016-09-21", "2017-02-17")
-
-worksheet.write(0, 0, 'Time')
-worksheet.write(0, 1, 'Shares')
-worksheet.write(0, 2, 'Cash')
-worksheet.write(0, 3, 'Shares Bought')
 
 total = 0
 for l in range(len(historicalData)):
@@ -185,16 +198,21 @@ for i in range(len(historicalData)):
         w.sell(shre.getID(), openVar)
     elif(iterationsPercentChange > percentChange): # if change for current day is higher than average
         sharesBought = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + closeVar)/3)*2)-closeVar)
-        print("["+time.strftime("%H:%M:%S")+"] [CASH]\t\t"+str(w.getCash()))
-        file.write(("["+time.strftime("%H:%M:%S")+"]"))
-        file.write(" Shares ID: " + str(total))
-        file.write(" Cash " + str(w.getCash()))
-        file.write(" Shares Bought " + str(sharesBought) + "\n")
 
-        worksheet.write(total, 0, time.strftime("%H:%M:%S"))
-        worksheet.write(total, 1, int(total))
-        worksheet.write(total, 2, str(w.getCash()))
-        worksheet.write(total, 3, sharesBought)
+        print("["+time.strftime("%H:%M:%S")+"]\t["+shre.getID()+" ID]\t["+str(total)+"]")
+        print("["+time.strftime("%H:%M:%S")+"]\t[CASH]\t["+str(w.getCash())+"]")
+        print("["+time.strftime("%H:%M:%S")+"]\t["+shre.getID()+"]\t[SharesBought] \t["+str(sharesBought)+"]")
+
+        with open("out.log", "w") as f:
+            f.write("["+time.strftime("%H:%M:%S")+"]\t["+shre.getID()+" ID]\t["+str(total)+"]\n")
+            f.write("["+time.strftime("%H:%M:%S")+"]\t[CASH]\t["+str(w.getCash())+"]\n")
+            f.write("["+time.strftime("%H:%M:%S")+"]\t["+shre.getID()+"]\t[SharesBought] \t["+str(sharesBought)+"]\n")
+
+        if(excel):
+            worksheet.write(total, 0, time.strftime("%H:%M:%S"))
+            worksheet.write(total, 1, int(total))
+            worksheet.write(total, 2, w.getCash())
+            worksheet.write(total, 3, sharesBought)
 
         w.buy(shre.getID(), openVar, sharesBought)
 
@@ -202,14 +220,16 @@ for i in range(len(historicalData)):
 
 w.sell(shre.getID(), closeVar)
 print("Ending total: "+str(w.getCash()))
-worksheet.write(total, 1, int(total))
-worksheet.write(total, 2, w.getCash())
 
-chart = workbook.add_chart({'type': 'line'})
+if(excel):
+    worksheet.write(total, 1, int(total))
+    worksheet.write(total, 2, w.getCash())
 
-chart.add_series({'values':    '=Sheet1!$C$2:$C'+str(len(historicalData)+1)})
-chart.set_title ({'name': 'Revenue Chart'})
-chart.set_style(10)
-worksheet.insert_chart('F2', chart)
+    chart = workbook.add_chart({'type': 'line'})
 
-workbook.close()
+    chart.add_series({'values':'=Sheet1!$C$2:$C'+str(len(historicalData)+1)})
+    chart.set_title ({'name': 'Revenue Chart'})
+    chart.set_style(10)
+    worksheet.insert_chart('F2', chart)
+
+    workbook.close()
