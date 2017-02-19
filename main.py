@@ -37,16 +37,12 @@ class Wallet():
                             highestIDIndex = i
                     error = False
                     if(highestIDIndex != -1): # if highestIDIndex is -1, it means that the share is not yet owned, so add it w/o comparing change
-                        if(float(data["shares"][highestIDIndex]["change"]) < (obj.getChange() - 0.01)):
-                                data["shares"].append({ # add new price to appropriate id
-                                    "id": obj.getID(),
-                                    "price": obj.getPrice(),
-                                    "time": time.strftime("%H:%M:%S"),
-                                    "change": obj.getChange()
-                                })
-                        else:
-                            error = True
-                            print("Change not enough to buy another share!")
+                        data["shares"].append({ # add new price to appropriate id
+                            "id": obj.getID(),
+                            "price": obj.getPrice(),
+                            "time": time.strftime("%H:%M:%S"),
+                            "change": obj.getChange()
+                        })
                     else:
                         data["shares"].append({ # add new price to appropriate id
                             "id": obj.getID(),
@@ -199,10 +195,11 @@ for i in range(len(historicalData)):
     iterationsPercentChange = shre.getCalculatedChange(float(historicalData[i]["Open"]), float(historicalData[i]["Close"]))
     if(iterationsPercentChange < percentChange): # if it is less than the percent change we're looking for, do this
         print("less")
-    elif(iterationsPercentChange > percentChange): 
+        w.sell(shre.getID())
+    elif(iterationsPercentChange > percentChange):
         print("more")
+        w.buy(shre.getID())
     else:
         print("not enough change")
-
 
     
