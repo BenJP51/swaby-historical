@@ -2,15 +2,14 @@ from yahoo_finance import Share
 import time, json, sys, ssl, math
 
 class Wallet():
-
-    def __init__(self):
-        a = 1
-
     def buy(self, ID, price, numToBuy):
         obj = ShareObj(ID)
         obj.refresh()
 
         if(self.cash > price): #if you have sufficient funds
+            if(self.cash < price*numToBuy):
+                numToBuy = int((self.cash / numToBuy)- 3)
+
             with open('data.json', 'r+') as file:
                 try:
                     data = json.load(file) # read file
@@ -151,12 +150,11 @@ class ShareObj(object):
     def getCalculatedChange(self, open, close):
         return ((close - open)/open)*100
 
-w = Wallet()
-
-stocksToWatch = "TMUS"
-
 ssl._create_default_https_context = ssl._create_unverified_context
 
+w = Wallet()
+
+stocksToWatch = "EXPE" # For example: FB, TMUS, AMD, MSFT, EXPE
 shre = ShareObj(stocksToWatch)
 historicalData = shre.getHistorical("2016-09-21", "2017-02-17")
 
@@ -164,7 +162,8 @@ total = 0
 for l in range(len(historicalData)):
         total += shre.getCalculatedChange(float(historicalData[l]["Open"]), float(historicalData[l]["Close"]))
 
-percentChange = (total/len(historicalData))+1
+slope = (float(historicalData[0]["Open"]) - float(historicalData[len(historicalData)-1]["Close"]))/len(historicalData)
+percentChange = (total/len(historicalData))+slope
 
 w.setCash(10000)
 total = 1
@@ -180,7 +179,7 @@ for i in range(len(historicalData)):
         sharesBought = int((((float(historicalData[i]["High"]) + float(historicalData[i]["Low"]) + closeVar)/3)*2)-closeVar)
         print("["+time.strftime("%H:%M:%S")+"] [CASH]\t\t"+str(w.getCash()))
         print("["+time.strftime("%H:%M:%S")+"] [SHARES]\t ["+str(total)+"]\t"+str(sharesBought))
-
+        # sharesBought = int(w.getCash() / sharesBought)
         w.buy(shre.getID(), openVar, sharesBought)
 
         total += 1
