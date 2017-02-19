@@ -11,11 +11,11 @@ class Wallet():
             except ValueError:
                 raise ValueError('Cannot read JSON file')
 
-    def buy(self, ID):
+    def buy(self, ID, price):
         obj = ShareObj(ID)
         obj.refresh()
 
-        if(self.cash > float(obj.getPrice())): #if you have sufficient funds
+        if(self.cash > price): #if you have sufficient funds
             with open('data.json', 'r+') as file:
                 try:
                     data = json.load(file) # read file
@@ -31,7 +31,7 @@ class Wallet():
                 try: #to allow for multiple shares to be done you could like set a variable of percent change in the json, read that. if that *= 0.05 isn't less that the current percent change, don't buy again
                     data["shares"].append({ # add new price to appropriate id
                         "id": obj.getID(),
-                        "price": obj.getPrice(),
+                        "price": price,
                         "time": time.strftime("%H:%M:%S"),
                         "change": obj.getChange()
                     })
@@ -40,7 +40,7 @@ class Wallet():
                     # uh oh!!! that ID doesnt exist yet!! just create it :)
                     data['shares'].append({
                         "id": obj.getID(),
-                        "price": obj.getPrice(),
+                        "price": price,
                         "time": time.strftime("%H:%M:%S"),
                         "change": obj.getChange()
                     })
@@ -50,11 +50,11 @@ class Wallet():
                 file.write(data)
                 file.close()
 
-                self.setCash(self.cash - float(obj.getPrice())) #buy that shit
+                self.setCash(self.cash - price) #buy that shit
 
                 self.writeCash()
 
-    def sell(self, ID):
+    def sell(self, ID, sellPrice):
         obj = ShareObj(ID)
         obj.refresh()
 
@@ -93,7 +93,7 @@ class Wallet():
             file.write(data)#write to json
             file.close() #close json
 
-            self.setCash(self.cash + float(obj.getPrice())*int(len(shareAmount)))
+            self.setCash(self.cash + sellPrice*int(len(shareAmount)))
             self.writeCash()
 
     def getCash(self):
@@ -179,9 +179,9 @@ for i in range(len(historicalData)):
     iterationsPercentChange = shre.getCalculatedChange(float(historicalData[i]["Open"]), float(historicalData[i]["Close"]))
     if(iterationsPercentChange < percentChange): # if it is less than the percent change we're looking for, do this
         print("less")
-        w.sell(shre.getID())
+        w.sell(shre.getID(), float(historicalData[i]["Close"]))
     elif(iterationsPercentChange > percentChange):
         print("more")
-        w.buy(shre.getID())
+        w.buy(shre.getID(), float(historicalData[i]["Close"]))
     else:
         print("not enough change")
