@@ -13,4 +13,6 @@ python main.py
 ## ToDo
  - Logging in External Files
  - Config file
- - Cryptocurrencies
+ - Optimize
+ - Write GUI
+ - Output to XSLX
